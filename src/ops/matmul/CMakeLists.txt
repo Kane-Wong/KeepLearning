@@ -10,12 +10,16 @@ endif()
 add_compile_options(-O3 -g -Wall)
 include_directories(../../../include)
 include_directories(../../../include/cpu)
-include_directories(../../../include/cuda)
 
-set(SOURCE_GPU
-    matmul.cu
+set(SOURCE_CPU
     matmul.cpp
     ../../common.cpp 
+)
+add_executable(matmul_cpu  ${SOURCE_CPU} main.cpp)
+
+include_directories(../../../include/cuda)
+set(SOURCE_GPU
+    matmul.cu
     ../../common.cu 
 )
-add_executable(matmul_gpu  ${SOURCE_GPU} main.cu)
+add_executable(matmul_gpu  ${SOURCE_GPU} ${SOURCE_CPU} main.cu)

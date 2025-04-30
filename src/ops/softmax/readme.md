@@ -1,14 +1,27 @@
+# softmax
 
-
-## 性能分析
-### sample1_softmax
-矩阵尺寸：[1024,1024]
+## cpu性能
+### sample1
+matrix size: [1024,1024]
 
 |  cpu(ms)    | method   |      other       |  
 | ----------- |--------- |----------------- |
 | 19.941      | case0    |                  |
 | 26.601      | case1    |                  |
 | 36.953      | case2    | online softmax   |
+
+### sample2
+matrix size: [1024,2048] 
+
+|  cpu(ms)    | method   |      other       |  
+| ----------- |--------- |----------------- |
+| 44.282      | case0    |                  |
+| 71.303      | case2    |                  |
+
+
+## gpu性能
+### sample1
+matrix size: [1024,1024]
 
 | RTX 3090(ms) | method   |      other                  |  
 | ------------ |--------- |---------------------------- |
@@ -19,15 +32,8 @@
 | 3.141        | case4    | <<<1024, 1>>>, fun0_online  |
 | 4.853        | case5    | <<<1024, 32>>>, fun2_online |
 
-
-### sample2_softmax
-矩阵尺寸：[1024,2048] ，cpu运行耗时 44.282ms
-
-|  cpu(ms)    | method   |      other       |  
-| ----------- |--------- |----------------- |
-| 44.282      | case0    |                  |
-| 71.303      | case2    |                  |
-
+### sample2
+matrix size: [1024,2048] 
 
 | RTX 3090(ms) | method   |      other       |  
 | ------------ |--------- |----------------- |

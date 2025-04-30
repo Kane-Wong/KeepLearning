@@ -1,8 +1,8 @@
+# reduce
 
-
-## 性能分析
-### sample1_reduce_sum
-矩阵尺寸：[1024,1024] ，cpu运行耗时 3.91ms
+## reduce_sum_gpu
+### sample1
+matrix size: [1024,1024] ，cpu运行耗时 3.91ms
 
 | TITAN V(ms) | method   |      other       |  
 | ----------- |--------- |----------------- |
@@ -20,8 +20,8 @@
 | 0.114        | case6    | __shfl_xor_sync  |
 
 
-### sample2_reduce_sum
-矩阵尺寸：[2048,2048] ，cpu运行耗时 13.195ms
+### sample2
+matrix size: [2048,2048] ，cpu运行耗时 13.195ms
 
 | RTX 3090(ms) | method   |      other       |  
 | ------------ |--------- |----------------- |

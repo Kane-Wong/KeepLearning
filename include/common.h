@@ -14,6 +14,7 @@ struct timerecord{
 void printDeviceInfor(int deviceID);
 
 void printTimeGap(timerecord start, timerecord end, std::string prefix);
+void printTimeGapLoop(timerecord start, timerecord end, int loop_num, std::string prefix);
 
 template<typename T>
 void validResult(T* golden_result, T* compare_result, int data_size, float max_diff)
