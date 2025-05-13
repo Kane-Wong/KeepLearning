@@ -7,15 +7,17 @@ int main(int argc, char **argv)
     printf("cpu running case %d\n", case_number);
     
     // 1. 环境准备
-    const int elem_nums = batch_size * num_heads * token_nums * head_size;
-    const int data_size = elem_nums * sizeof(float);
-    float *host_Q = (float *)malloc(data_size);
-    float *host_K = (float *)malloc(data_size);
-    float *host_V = (float *)malloc(data_size);
-    float *result_cpu = (float *)malloc(data_size);
+    const int q_elem_nums = batch_size * num_heads * q_token_nums * head_size;
+    const int kv_elem_nums = batch_size * num_heads * kv_token_nums * head_size;
+    float *host_Q = (float *)malloc(q_elem_nums * sizeof(float));
+    float *host_K = (float *)malloc(kv_elem_nums * sizeof(float));
+    float *host_V = (float *)malloc(kv_elem_nums * sizeof(float));
+    float *result_cpu = (float *)malloc(q_elem_nums * sizeof(float));
 
-    for(int i=0; i<elem_nums; i++){
+    for(int i=0; i<q_elem_nums; i++){
         host_Q[i] = rand() % 100;
+    }
+    for(int i=0; i<kv_elem_nums; i++){
         host_K[i] = rand() % 100;
         host_V[i] = rand() % 100;
     }

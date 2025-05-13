@@ -30,8 +30,8 @@ int main(int argc, char **argv)
     const size_t block_x=64, block_y=64;
     size_t grid_x = (matrix_size+block_x -1) / block_x;
     size_t grid_y = (matrix_size+block_y-1) / block_y;
-    dim3 dimGrid(grid_y, grid_x);
-    dim3 dimBlock(block_y, block_x);
+    dim3 dimGrid(grid_x, grid_y);
+    dim3 dimBlock(block_x, block_y);
     cudaMemcpy(d_a, a, size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_b, b, size, cudaMemcpyHostToDevice);
 
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
         _cuda_compute_fun2<block_x, block_y><<<dimGrid, dimBlock>>>(d_a, d_b, d_r, matrix_size);
         break;
     case 3:
-        _cuda_compute_fun3<block_x, block_y><<<dimGrid, dim3(block_y/8, block_x/8)>>>(d_a, d_b, d_r, matrix_size); 
+        _cuda_compute_fun3<block_x, block_y><<<dimGrid, dim3(block_x/8, block_y/8)>>>(d_a, d_b, d_r, matrix_size); 
         break;
     default:
         printf("Error: Invalid gpu running case: %d\n", gpu_case);

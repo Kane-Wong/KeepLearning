@@ -1,82 +1,42 @@
 #include "attention.cuh"
+#include "softmax.cuh"
 
-int main(int argc, char **argv)
+
+// 每个线程处理一个q_token
+__global__ void attention_cuda_fun0(float* matQ, float* matK, float* matV, float* matR, float* attIn, float *attOut)
 {
-    const int cpu_case = atoi(argv[1]);
-    const int gpu_case = atoi(argv[2]);
-    printf("cpu running case %d, gpu running case %d\n", cpu_case, gpu_case);
-    
-    const int deviceID = 0;
-    cudaSetDevice(deviceID);
-    printDeviceInfor(deviceID);
-    
-    // 1. 环境准备
-    const int elem_nums = batch_size * num_heads * token_nums * head_size;
-    const int data_size = elem_nums * sizeof(float);
-    float *host_Q = (float *)malloc(data_size);
-    float *host_K = (float *)malloc(data_size);
-    float *host_V = (float *)malloc(data_size);
-    float *result_cpu = (float *)malloc(data_size);
-    float *result_gpu = (float *)malloc(data_size);
-    float *device_Q, *device_K, *device_V, *device_R;
-    cudaMalloc((void **) &device_Q, data_size);
-    cudaMalloc((void **) &device_K, data_size);
-    cudaMalloc((void **) &device_V, data_size);
-    cudaMalloc((void **) &device_R, data_size);
-    
-    for(int i=0; i<elem_nums; i++){
-        host_Q[i] = rand() % 100;
-        host_K[i] = rand() % 100;
-        host_V[i] = rand() % 100;
-    }
-    cudaMemcpy(device_Q, host_Q, data_size, cudaMemcpyHostToDevice);
-    cudaMemcpy(device_K, host_K, data_size, cudaMemcpyHostToDevice);
-    cudaMemcpy(device_V, host_V, data_size, cudaMemcpyHostToDevice);
+    const int headID = blockIdx.x;
+    const int tID = threadIdx.x;
+    assert(q_token_nums<1024);  // 每个block内最多处理1024个q_token
+    float *Q_start = matQ + headID * q_token_nums * head_size + tID * head_size;
+    float *K_start = matK + headID * kv_token_nums * head_size;
+    float *V_start = matV + headID * kv_token_nums * head_size;
+    float *R_start = matR + headID * q_token_nums * head_size +  tID * head_size;
+    float *attIn_start = attIn + headID * q_token_nums * kv_token_nums + tID * kv_token_nums;
+    float *attOut_start = attOut + headID * q_token_nums * kv_token_nums + tID * kv_token_nums;
+    float *v_temp = V_start;
 
-    // 2. gpu 计算
-    timerecord start, end;
-    start.freshtime();
-    switch (gpu_case)
+    for(int k=0; k<kv_token_nums; k++)
     {
-    case 0:
-        _cuda_compute_fun0<<<dimGrid, dimBlock>>>(d_a, d_b, d_r, matrix_size);
-        break;
-    default:
-        printf("Error: Invalid gpu running case: %d\n", gpu_case);
-        return EXIT_FAILURE;
+        float sum_val = 0;
+        for (int i=0; i<head_size; i++)
+        {
+            sum_val += Q_start[i] * K_start[i];
+        }
+        attIn_start[k] = sum_val / sqrtf(head_size);
+        K_start += head_size;
     }
-    cudaDeviceSynchronize(); // 同步，且检查执行期间发生的错误
-    cudaMemcpy(result_gpu, device_R, data_size, cudaMemcpyDeviceToHost);
-    end.freshtime();
-    printTimeGap(start, end, "gpu");
-    
-    // 3. cpu 计算
-    start.freshtime();
-    switch (cpu_case)
+    softmax_vector(attIn_start, attOut_start, kv_token_nums);
+
+    for(int i=0; i<head_size; i++)
     {
-    case 0:
-        _cpu_compute_fun0(a, b, r, matrix_size);
-        break;
-    default:
-        printf("Error: Invalid cpu running case: %d\n", cpu_case);
-        return EXIT_FAILURE;
+        float sum_val = 0;
+        v_temp = V_start + i;
+        for(int k=0; k<kv_token_nums; k++)
+        {
+            sum_val += attOut_start[k] * (*v_temp);
+            v_temp += head_size;
+        }
+        R_start[i] = sum_val; 
     }
-    end.freshtime();
-    printTimeGap(start, end, "cpu");
-
-    // 4. 结果验证
-    validResult<float>(r, r_re, matrix_size*matrix_size, 1e-10);
-
-    // 5. 环境释放
-    free(host_Q);
-    free(host_K);
-    free(host_V);
-    free(result_cpu);
-    free(result_gpu);
-    cudaFreeHost(device_Q);
-    cudaFreeHost(device_K);
-    cudaFreeHost(device_V);
-    cudaFreeHost(device_R);
-   
-    return 0;
 }

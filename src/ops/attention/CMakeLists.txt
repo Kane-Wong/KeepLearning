@@ -11,9 +11,18 @@ add_compile_options(-O3 -g -Wall)
 include_directories(../../../include)
 include_directories(../../../include/cpu)
 
-set(SOURCE
+set(SOURCE_CPU
     attention.cpp
     ../../common.cpp 
     ../softmax/softmax.cpp 
 )
-add_executable(attention_cpu ${SOURCE} main.cpp)
+# add_executable(attention_cpu ${SOURCE_CPU} main.cpp)
+
+
+include_directories(../../../include/cuda)
+set(SOURCE_GPU
+    attention.cu
+    ../../common.cu 
+)
+
+add_executable(attention_gpu ${SOURCE_GPU} ${SOURCE_CPU} main.cu)

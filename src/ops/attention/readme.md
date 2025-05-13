@@ -20,4 +20,14 @@ bash ../../../build.sh
 | case0   | 30.834   |
 
 ## gpu性能
+### sample1
+输入尺寸：Q[1, 12, 128, 64]、K[1, 12, 128, 64]、V[1, 12, 128, 64]   
+
+| method  | time(ms) | 
+| ------- |--------- |
+| case0   | 4.412    |
+
+
+## knowledge
+1. __device__ 修饰的代码在同一文件或头文件定义，或加参数`-relocatable-device-code=true`， 否则编译时出现链接错误“ptxas fatal”.
 
