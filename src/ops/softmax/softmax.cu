@@ -1,7 +1,9 @@
 #include "softmax.cuh"
 
-// 开启M个线程，对应M行
-__global__ void softmax_gpu_fun0(float* input, float* output)
+// safe softmax, 开启M个线程，对应M行
+// input: [M, N]
+// output: [M, N]
+__global__ void softmax_gpu_fun0(float* input, float* output, const int M, const int N)
 {
     int tid = threadIdx.x + blockDim.x * blockIdx.x;
     float* row_in = input + tid * N;
@@ -10,14 +12,17 @@ __global__ void softmax_gpu_fun0(float* input, float* output)
     float sum_row = 0;
     if(tid<M)
     {
+        // step1：求最大值
         for(int j=1; j<N; j++)
         {
             max_value = max(max_value, row_in[j]);
         }
+        // step2：求指数和
         for(int j=0; j<N; j++)
         {
             sum_row +=  exp(row_in[j] - max_value);
         }
+        // step3：除法计算
         for(int j=0; j<N; j++)
         {
             row_out[j] = exp(row_in[j] - max_value) / sum_row;
@@ -61,7 +66,7 @@ __global__ void softmax_gpu_fun2(float* input, float* output, const int M_, cons
 }
 
 // fun0 online softmax
-__global__ void softmax_gpu_fun3(float* input, float* output)
+__global__ void softmax_gpu_fun3(float* input, float* output, const int M, const int N)
 {
     int tid = threadIdx.x + blockDim.x * blockIdx.x;
     float* row_in = input + tid * N;

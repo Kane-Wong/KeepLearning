@@ -7,6 +7,8 @@ int main(int argc, char **argv)
     printf("cpu running case %d\n", case_number);
 
     // 1. 环境准备
+    constexpr int M  = 1024;
+    constexpr int N  = 1024;
     int data_size = M * N * sizeof(float);
     float* input_host = (float *) malloc(data_size);
     float* output_host_cpu = (float *) malloc(data_size);
@@ -20,13 +22,13 @@ int main(int argc, char **argv)
     switch (case_number)
     {
     case 0:
-        softmax_cpu_fun0(input_host, output_host_cpu);
+        softmax_cpu_fun0(input_host, output_host_cpu, M, N);
         break;
     case 1:
-        softmax_cpu_fun1(input_host, output_host_cpu);
+        softmax_cpu_fun1(input_host, output_host_cpu, M, N);
         break;
     case 2:
-        softmax_cpu_fun2(input_host, output_host_cpu);
+        softmax_cpu_fun2(input_host, output_host_cpu, M, N);
         break;
     default:
         printf("Error: Invalid cpu running case: %d\n", case_number);

@@ -1,6 +1,6 @@
 #include "softmax.h"
 
-void softmax_cpu_fun0(float *input, float *output)
+void softmax_cpu_fun0(float *input, float *output, const int M, const int N)
 {
     float* row_in = input;
     float* row_out = output;
@@ -26,7 +26,7 @@ void softmax_cpu_fun0(float *input, float *output)
     }
 }
 
-void softmax_cpu_fun1(float* input, float* output) {
+void softmax_cpu_fun1(float* input, float* output, const int M, const int N) {
     for (int m = 0; m < M; ++m) {
         float maxval = -INFINITY;
         const float* x = input + m * N;
@@ -44,7 +44,7 @@ void softmax_cpu_fun1(float* input, float* output) {
     }
 }
 
-void softmax_cpu_fun2(float *input, float *output)
+void softmax_cpu_fun2(float *input, float *output, const int M, const int N)
 {
     float* row_in = input;
     float* row_out = output;

@@ -1,6 +1,7 @@
 #include "softmax.h"
 
-__global__ void softmax_gpu_fun0(float* input, float* output);
+// 开启M个线程，每个线程处理N个元素的softmax
+__global__ void softmax_gpu_fun0(float* input, float* output, const int M, const int N);
 
 // 开启 M*N 个线程，归约求 max 和 sum， 最大支持横轴点数：1024
 template<int BLOCK_SIZE>
@@ -45,12 +46,13 @@ __global__ void softmax_gpu_fun1(float* input, float* output)
 __global__ void softmax_gpu_fun2(float* input, float* output, const int M_, const int N_);
 
 // fun0 online softmax
-__global__ void softmax_gpu_fun3(float* input, float* output);
+__global__ void softmax_gpu_fun3(float* input, float* output, const int M, const int N);
 
 // fun2 online softmax
 __global__ void softmax_gpu_fun4(float* input, float* output, const int M_, const int N_);
 
-__device__ void softmax_vector(float *input, float *output, int elem_nums)
+// 对每一行做softmax时调用
+__device__ inline void softmax_vector(float *input, float *output, int elem_nums)
 {
     float max_value = *input;
     float sum_row = 0;

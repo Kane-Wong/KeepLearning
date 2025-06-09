@@ -2,7 +2,7 @@
 #include "softmax.cuh"
 
 
-// 每个线程处理一个q_token
+// 共[batch_size*num_head]个block，每个block有num_Q个线程，每个线程处理一个q_token
 __global__ void attention_cuda_fun0(float* matQ, float* matK, float* matV, float* matR, float* attIn, float *attOut)
 {
     const int headID = blockIdx.x;
